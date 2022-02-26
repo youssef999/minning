@@ -1,25 +1,19 @@
-
-
 import 'dart:async';
 import 'dart:io';
-
+//import 'package:admob_flutter/admob_flutter.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:ecommerce_api/second.dart';
-
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:startapp/startapp.dart';
+import 'package:unity_ads_plugin/unity_ads.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'adsManger.dart';
 import 'components/applocal.dart';
 
-
 SharedPreferences mySharedPreferences;
-
 
 class Pomodoro extends StatefulWidget {
   String lan;
@@ -36,6 +30,7 @@ class _State extends State<Pomodoro> {
   bool stop = false;
   String txt1;
   bool ads = false;
+  bool ads2 = false;
   String watch = "watch ads";
   SharedPreferences prefs;
   int score = 0;
@@ -47,7 +42,7 @@ class _State extends State<Pomodoro> {
   Timer timer;
   Color color = Colors.orangeAccent;
   Color color2 = Colors.grey;
-  RewardedVideoAd videoAd = RewardedVideoAd.instance;
+  Color color3 = Colors.grey;
   String txt = 'Minning';
   bool videoCompleted = false;
   String error = '';
@@ -55,15 +50,25 @@ class _State extends State<Pomodoro> {
   String scoree = 'score';
   String request = "Request";
   String txt4 = 'Continue minning';
+  bool stop2 = false;
+  // AdmobInterstitial intersitialAd;
 
   @override
   void initState() {
-    FirebaseAdMob.instance
-        .initialize(appId: 'ca-app-pub-4801644190189400~6035455652');
+    UnityAds.init(
+      gameId: '4567161',
+      // testMode: true,
+    );
+
     setState(() {
       getData();
-   //   getlang();
+      //   getlang();
     });
+    @override
+    void dispose() {
+      super.dispose();
+    }
+
     // if (widget.lan == 'en') {
     //   minning = 'Minning';
     //   message =
@@ -94,22 +99,23 @@ class _State extends State<Pomodoro> {
     //   message =
     //       'पैसे का अनुरोध करने के लिए आपका स्कोर 1 मिलियन और 800 से अधिक या उसके बराबर होना चाहिए';
     // }
-    RewardedVideoAd.instance.load(
-        adUnitId: 'ca-app-pub-4801644190189400/2473283462'
-        //'ca-app-pub-4801644190189400/4424659381',
-        //'ca-app-pub-7757590907378676/2778691799',
-        //AdmobReward.testAdUnitId,
-        // "ca-app-pub-9553580055895935/1690226045",
-        ,
-        targetingInfo: MobileAdTargetingInfo());
+    // RewardedVideoAd.instance.load(
+    //     adUnitId: //'ca-app-pub-3940256099942544/5224354917'
+    //         'ca-app-pub-3308888383378667/2528732511'
+    //     //'ca-app-pub-4801644190189400/4424659381',
+    //     //'ca-app-pub-7757590907378676/2778691799',
+    //     //AdmobReward.testAdUnitId,
+    //     // "ca-app-pub-9553580055895935/1690226045",
+    //     ,
+    //     targetingInfo: MobileAdTargetingInfo());
 
-    RewardedVideoAd.instance.listener =
-        (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
-      if (event == RewardedVideoAdEvent.rewarded) {
-        print("sss");
-        // coins=coins+rewardAmount;
-      }
-    };
+    // RewardedVideoAd.instance.listener =
+    //     (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
+    //   if (event == RewardedVideoAdEvent.rewarded) {
+    //     print("sss");
+    //     // coins=coins+rewardAmount;
+    //   }
+    // };
   }
 
   @override
@@ -134,14 +140,14 @@ class _State extends State<Pomodoro> {
 
   savelang(String lang) async {
     prefs = await SharedPreferences.getInstance();
-   // prefs.setString('lang', lang);
+    // prefs.setString('lang', lang);
     // prefs.setInt('money',m);
   }
 
   getlang() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
-    //  widget.lan = prefs.getString('lang') ?? widget.lan;
+      //  widget.lan = prefs.getString('lang') ?? widget.lan;
     });
   }
 
@@ -150,7 +156,7 @@ class _State extends State<Pomodoro> {
     timeInMinut = timeInMinut;
     int Time = timeInMinut * 60;
     double secPercent = (Time / 100);
-    timer = Timer.periodic(Duration(milliseconds: 1), (timer) {
+    timer = Timer.periodic(Duration(microseconds:60), (timer) {
       setState(() {
         if (Time >= 0) {
           Time = Time + 1;
@@ -161,11 +167,16 @@ class _State extends State<Pomodoro> {
           }
 
           if (timeInMinut % 300 == 0) {
-            stop = true;
+            //  stop = true;
+            stop2 = true;
+            //  ads = true;
             txt = txt1; //'Watch ad then Continue';
             color = Colors.grey;
-            color2 = Colors.green;
+            // color3 = Colors.green;
             money++;
+            ads = true;
+            color2 = Colors.green;
+            color3 = Colors.green;
             percent = 0.0;
             timeInMinut = timeInMinut + 1;
             timer.cancel();
@@ -178,7 +189,7 @@ class _State extends State<Pomodoro> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-       debugShowCheckedModeBanner:false,
+      debugShowCheckedModeBanner: false,
       home: SafeArea(
           child: Scaffold(
         body: Container(
@@ -200,8 +211,8 @@ class _State extends State<Pomodoro> {
                     child: Text
                         // ("${getLang(context , "min")}",
                         (
-                          "${getLang(context, "minning")}",
-                     // minning,
+                      "${getLang(context, "minning")}",
+                      // minning,
                       // language.Minning(),
                       style: TextStyle(
                         color: Colors.white,
@@ -212,10 +223,13 @@ class _State extends State<Pomodoro> {
                   SizedBox(width: 30),
                   Padding(
                       padding: EdgeInsets.only(top: 20, left: 40),
-                      child: Text("${getLang(context, "scoree")}" + " = " + score.toString(),
+                      child: Text(
+                          "${getLang(context, "scoree")}" +
+                              " = " +
+                              score.toString(),
                           style: TextStyle(
                               color: Colors.black,
-                              fontSize: 25.0,
+                              fontSize: 21.0,
                               fontWeight: FontWeight.bold)))
                 ],
               ),
@@ -242,21 +256,10 @@ class _State extends State<Pomodoro> {
               RaisedButton(
                 color: Colors.red,
                 onPressed: () {
-                  if (score < 2800) {
-                    showDialog(
-                        context: context,
-                        builder: (_) => new AlertDialog(
-                              title: new Text(" !!! "),
-                              content: new Text(message),
-                            ));
-                  } else {
-                    sendWhatsApp('+9647725256635',
-                        'hello i am using minning app =  ' + score.toString());
-                  }
+                  sendinsta();
                 },
                 child: Text(
-                  "${getLang(context, "request")}",
-                //  request,
+                  "${getLang(context, "insta")}",
                   style: TextStyle(color: Colors.white, fontSize: 22.0),
                 ),
               ),
@@ -279,13 +282,17 @@ class _State extends State<Pomodoro> {
                     padding: EdgeInsets.only(top: 2.0, left: 20.0, right: 20.0),
                     child: ListView(
                       children: <Widget>[
+                        UnityBannerAd(
+                          placementId: '6',
+                        ),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 10.0),
                           child: RaisedButton(
                               onPressed: () {
                                 if (stop == false) {
-                                  _startTimer();
                                   stop = true;
+
+                                  _startTimer();
                                 }
                               },
                               color: color,
@@ -296,87 +303,139 @@ class _State extends State<Pomodoro> {
                                 padding: EdgeInsets.all(20.0),
                                 child: Text(
                                   "${getLang(context, "txt")}",
-                                 // 'txt',
-                               //   txt,
+                                  // 'txt',
+                                  //   txt,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 22.0),
                                 ),
                               )),
                         ),
                         SizedBox(height: 6),
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12.0),
-                          child: RaisedButton(
-                              onPressed: () async {
-                                if (stop == true) {
-                                  videoAd.load(
-                                      adUnitId:
-                                          'ca-app-pub-3940256099942544/5224354917');
+                        // Padding(
+                        //   padding: EdgeInsets.symmetric(vertical: 12.0),
+                        //   child: RaisedButton(
+                        //       onPressed: () async {
+                        //        // Startapp.instance.initialize( appId: Platform.isIOS ? '200488938' : '200488938', accountId: '');
+                        //         if (stop2 == true) {
+                        //           print("mmmm");
 
-                                  videoAd.show();
-                                  RewardedVideoAd.instance.listener =
-                                      (RewardedVideoAdEvent event,
-                                          {String rewardType,
-                                          int rewardAmount}) {
-                                    if (event ==
-                                        RewardedVideoAdEvent.rewarded) {
-                                      setState(() {
-                                        videoCompleted = true;
-                                        stop = false;
-                                        ads = false;
-                                        txt = txt4;
-                                        //'Watch ad then Continue';
-                                        color = Colors.green;
-                                        color2 = Colors.grey;
-                                        txt = txt;
-                                        score = score + 300; //timeInMinut;
-                                      });
-                                      saveData(score);
-                                    }
-                                  };
-                                }
-                              },
-                              color: color2,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(20.0),
-                                child: Text(
-"${getLang(context, "watch")}",
-                               //   'watch',
-                                //  watch,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 22.0),
-                                ),
-                              )),
-                        ),
+                        //           UnityAds.showVideoAd(
+                        //             placementId: '07724020407‪Aa',//AdManager.rewardedVideoAdPlacementId,
+                        //             listener: (state, args) =>
+                        //                 print('Rewarded Video Listener: $state => $args'),
+                        //           );
+
+                        //           print("stop22222222222");
+                        //           await StartApp.showRewardedAd(
+                        //               onVideoCompleted: () {
+                        //                 setState(() {
+                        //                   videoCompleted = true;
+                        //                   stop = true;
+                        //                   stop2 = false;
+                        //                   ads = true;
+                        //                   //txt = 'Watch ad then Continue';
+                        //                   //color = Colors.green;
+                        //                   color2 = Colors.green;
+                        //                   color3 = Colors.grey;
+                        //                   txt = txt4;
+                        //                 //  score = score + 300; //timeInMinut;
+                        //                 });
+                        //                 saveData(score);
+                        //               }, onReceiveAd: () {
+                        //             print("recieved".toString());
+                        //             // ad received callback
+                        //           }, onFailedToReceiveAd: (String error) {
+                        //             print(error.toString());
+                        //             // failed to received ad callback
+                        //           });
+                        //         }
+                        //       },
+                        //       color: color3,
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(100.0),
+                        //       ),
+                        //       child: Padding(
+                        //         padding: EdgeInsets.all(20.0),
+                        //         child: Text(
+                        //           "${getLang(context, "watch")}",
+                        //           //   'p',
+                        //           //watch,
+                        //           style: TextStyle(
+                        //               color: Colors.white, fontSize: 22.0),
+                        //         ),
+                        //       )),
+                        // ),
                         SizedBox(height: 6),
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 12.0),
                           child: RaisedButton(
                               onPressed: () async {
-                                if (stop == true) {
-                                  await StartApp.showRewardedAd(
-                                      onVideoCompleted: () {
-                                    setState(() {
-                                      videoCompleted = true;
-                                      stop = false;
-                                      ads = false;
-                                      //txt = 'Watch ad then Continue';
-                                      color = Colors.green;
-                                      color2 = Colors.grey;
-                                      txt = txt4;
-                                      score = score + 300; //timeInMinut;
-                                    });
-                                    saveData(score);
-                                  }, onReceiveAd: () {
-                                    print("recieved".toString());
-                                    // ad received callback
-                                  }, onFailedToReceiveAd: (String error) {
-                                    print(error.toString());
-                                    // failed to received ad callback
-                                  });
+                                if (ads == true) {
+                                  print("uintyads");
+                                  UnityAds.showVideoAd(
+                                      placementId:
+                                          'Rewarded_Android', //AdManager.rewardedVideoAdPlacementId,
+                                      listener: (state, args) {
+                                        print(
+                                            'Rewarded Video Listener: $state => $args');
+                                        if (state == UnityAdState.complete) {
+                                          print(
+                                              'User watched a video. User should get a reward!');
+                                          setState(() {
+                                            videoCompleted = true;
+                                            stop2 = false;
+                                            ads = false;
+                                            stop = false;
+                                            score = score + 300;
+                                            color = Colors.green;
+                                            // stop = false;
+                                            // ads = false;
+                                            ads2 = true;
+                                            txt = txt4;
+                                            //'Watch ad then Continue';
+                                            //  color = Colors.green;
+                                            // color3 = Colors.green;
+                                            color2 = Colors.grey;
+                                            txt = txt;
+                                            // score = score + 300; //timeInMinut;
+                                            saveData(score);
+                                          });
+                                        } else if (state ==
+                                            UnityAdState.skipped) {
+                                          print('User cancel video.');
+                                        }
+                                      });
+                                  //  await videoAd.load(
+                                  //       adUnitId: 'ca-app-pub-3308888383378667/2528732511');
+                                  //           //  'ca-app-pub-3308888383378667/1483951026');
+                                  //       //    'ca-app-pub-3940256099942544/5224354917');
+                                  //   videoAd.show();
+                                  //   RewardedVideoAd.instance.listener =
+                                  //       (RewardedVideoAdEvent event,
+                                  //           {String rewardType,
+                                  //           int rewardAmount}) {
+                                  //     if (event ==
+                                  //         RewardedVideoAdEvent.rewarded) {
+                                  //       setState(() {
+                                  //         videoCompleted = true;
+                                  //         stop2 = false;
+                                  //         stop=false;
+                                  //         score = score + 300;
+                                  //         color = Colors.green;
+                                  //         // stop = false;
+                                  //         // ads = false;
+                                  //         ads2 = true;
+                                  //         txt = txt4;
+                                  //         //'Watch ad then Continue';
+                                  //         //  color = Colors.green;
+                                  //        // color3 = Colors.green;
+                                  //         color2 = Colors.grey;
+                                  //         txt = txt;
+                                  //         // score = score + 300; //timeInMinut;
+                                  //       });
+                                  //       saveData(score);
+                                  //     }
+                                  //   };
                                 }
                               },
                               color: color2,
@@ -387,13 +446,196 @@ class _State extends State<Pomodoro> {
                                 padding: EdgeInsets.all(20.0),
                                 child: Text(
                                   "${getLang(context, "watch")}",
-                               //   'p',
-                                  //watch,
+                                  //   'watch',
+                                  //  watch,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 22.0),
                                 ),
                               )),
                         ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12.0),
+                          child: RaisedButton(
+                              onPressed: () async {
+                                if (ads == true) {
+                                  print("uintyads");
+                                  UnityAds.showVideoAd(
+                                      placementId:
+                                      '2', //AdManager.rewardedVideoAdPlacementId,
+                                      listener: (state, args) {
+                                        print(
+                                            'Rewarded Video Listener: $state => $args');
+                                        if (state == UnityAdState.complete) {
+                                          print(
+                                              'User watched a video. User should get a reward!');
+                                          setState(() {
+                                            videoCompleted = true;
+                                            stop2 = false;
+                                            ads = false;
+                                            stop = false;
+                                            score = score + 300;
+                                            color = Colors.green;
+                                            // stop = false;
+                                            // ads = false;
+                                            ads2 = true;
+                                            txt = txt4;
+                                            //'Watch ad then Continue';
+                                            //  color = Colors.green;
+                                            // color3 = Colors.green;
+                                            color2 = Colors.grey;
+                                            txt = txt;
+                                            // score = score + 300; //timeInMinut;
+                                            saveData(score);
+                                          });
+                                        } else if (state ==
+                                            UnityAdState.skipped) {
+                                          print('User cancel video.');
+                                        }
+                                      });
+                                  //  await videoAd.load(
+                                  //       adUnitId: 'ca-app-pub-3308888383378667/2528732511');
+                                  //           //  'ca-app-pub-3308888383378667/1483951026');
+                                  //       //    'ca-app-pub-3940256099942544/5224354917');
+                                  //   videoAd.show();
+                                  //   RewardedVideoAd.instance.listener =
+                                  //       (RewardedVideoAdEvent event,
+                                  //           {String rewardType,
+                                  //           int rewardAmount}) {
+                                  //     if (event ==
+                                  //         RewardedVideoAdEvent.rewarded) {
+                                  //       setState(() {
+                                  //         videoCompleted = true;
+                                  //         stop2 = false;
+                                  //         stop=false;
+                                  //         score = score + 300;
+                                  //         color = Colors.green;
+                                  //         // stop = false;
+                                  //         // ads = false;
+                                  //         ads2 = true;
+                                  //         txt = txt4;
+                                  //         //'Watch ad then Continue';
+                                  //         //  color = Colors.green;
+                                  //        // color3 = Colors.green;
+                                  //         color2 = Colors.grey;
+                                  //         txt = txt;
+                                  //         // score = score + 300; //timeInMinut;
+                                  //       });
+                                  //       saveData(score);
+                                  //     }
+                                  //   };
+                                }
+                              },
+                              color: color2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100.0),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(20.0),
+                                child: Text(
+                                  "${getLang(context, "watch")}",
+                                  //   'watch',
+                                  //  watch,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 22.0),
+                                ),
+                              )),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 12.0),
+                          child: RaisedButton(
+                              onPressed: () async {
+                                if (ads == true) {
+                                  print("uintyads");
+                                  UnityAds.showVideoAd(
+                                      placementId:
+                                      '3', //AdManager.rewardedVideoAdPlacementId,
+                                      listener: (state, args) {
+                                        print(
+                                            'Rewarded Video Listener: $state => $args');
+                                        if (state == UnityAdState.complete) {
+                                          print(
+                                              'User watched a video. User should get a reward!');
+                                          setState(() {
+                                            videoCompleted = true;
+                                            stop2 = false;
+                                            ads = false;
+                                            stop = false;
+                                            score = score + 300;
+                                            color = Colors.green;
+                                            // stop = false;
+                                            // ads = false;
+                                            ads2 = true;
+                                            txt = txt4;
+                                            //'Watch ad then Continue';
+                                            //  color = Colors.green;
+                                            // color3 = Colors.green;
+                                            color2 = Colors.grey;
+                                            txt = txt;
+                                            // score = score + 300; //timeInMinut;
+                                            saveData(score);
+                                          });
+                                        } else if (state ==
+                                            UnityAdState.skipped) {
+                                          print('User cancel video.');
+                                        }
+                                      });
+                                  //  await videoAd.load(
+                                  //       adUnitId: 'ca-app-pub-3308888383378667/2528732511');
+                                  //           //  'ca-app-pub-3308888383378667/1483951026');
+                                  //       //    'ca-app-pub-3940256099942544/5224354917');
+                                  //   videoAd.show();
+                                  //   RewardedVideoAd.instance.listener =
+                                  //       (RewardedVideoAdEvent event,
+                                  //           {String rewardType,
+                                  //           int rewardAmount}) {
+                                  //     if (event ==
+                                  //         RewardedVideoAdEvent.rewarded) {
+                                  //       setState(() {
+                                  //         videoCompleted = true;
+                                  //         stop2 = false;
+                                  //         stop=false;
+                                  //         score = score + 300;
+                                  //         color = Colors.green;
+                                  //         // stop = false;
+                                  //         // ads = false;
+                                  //         ads2 = true;
+                                  //         txt = txt4;
+                                  //         //'Watch ad then Continue';
+                                  //         //  color = Colors.green;
+                                  //        // color3 = Colors.green;
+                                  //         color2 = Colors.grey;
+                                  //         txt = txt;
+                                  //         // score = score + 300; //timeInMinut;
+                                  //       });
+                                  //       saveData(score);
+                                  //     }
+                                  //   };
+                                }
+                              },
+                              color: color2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100.0),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(20.0),
+                                child: Text(
+                                  "${getLang(context, "watch")}",
+                                  //   'watch',
+                                  //  watch,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 22.0),
+                                ),
+                              )),
+                        ),
+                        SizedBox(height: 6),
+
+                        Container(
+                            height: 90,
+                            padding: EdgeInsets.all(10),
+                            margin: EdgeInsets.only(bottom: 20.0),
+                            child: UnityBannerAd(
+                              placementId: 'Banner_Android',
+                            ) ),
                       ],
                     ),
                   ),
@@ -403,19 +645,33 @@ class _State extends State<Pomodoro> {
                 padding: const EdgeInsets.only(top: 0),
                 child: CurvedNavigationBar(
                     color: Colors.white,
-                    backgroundColor: Colors.deepOrangeAccent,
+                    backgroundColor: Colors.white,
                     //buttonBackgroundColor:Colors.blue,
                     items: <Widget>[
                       Icon(Icons.home, size: 24, color: Colors.black),
                       //   Icon(Icons.add_box,size:24,color:Colors.red),
-                      Icon(Icons.ad_units_sharp, size: 24, color: Colors.red),
-                   //   Icon(Icons.settings, size: 24, color: Colors.cyan),
+                      Text("${getLang(context, "reward")}",
+                          style: TextStyle(color: Colors.red, fontSize: 21)),
+                      //   Icon(Icons.settings, size: 24, color: Colors.cyan),
                     ],
                     animationCurve: Curves.bounceOut,
                     onTap: (index) async {
                       if (index == 1) {
+
+                        await UnityAds.showVideoAd(
+                          placementId: '5',
+                          listener: (state, args) {
+                            if (state == UnityAdState.complete) {
+                              print('int ads');
+                            } else if (state == UnityAdState.skipped) {
+                              print('User cancel video.');
+                            }
+                          },
+                        );
+                        //   await StartApp.showInterstitialAd();
+                        // intersitialAd.show();
                         print(widget.lan.toString());
-                        Navigator.push(context,
+                        Navigator.pushReplacement(context,
                             MaterialPageRoute(builder: (context) {
                           return second(score: score, lang: widget.lan);
                         }));
@@ -438,6 +694,29 @@ class _State extends State<Pomodoro> {
       } else {
         // return 'whatsapp://send?phone=$phone&text=$msg';
         return "https://wa.me/$phone/?text=${Uri.parse(msg)}";
+        //  return 'whatsapp://send?$phone=phone&text=$msg';
+        //   return 'whatsapp://wa.me/$phone&text=$msg';
+      }
+    }
+
+    try {
+      await canLaunch(url()) ? launch(url()) : launch(url());
+      // : ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text('there is no whats app in your device')));
+    } catch (e) {
+      print("error" + e.toString());
+    }
+  }
+
+  sendinsta() async {
+    String url() {
+      if (Platform.isAndroid) {
+        return 'https://www.instagram.com/application_babil/';
+        // return "https://wa.me/$phone/?text=${Uri.parse(msg)}";
+        //  return 'whatsapp://wa.me/$phone/?text=${Uri.parse(msg)}';
+      } else {
+        // return 'whatsapp://send?phone=$phone&text=$msg';
+        return "https://www.instagram.com/application_babil/";
         //  return 'whatsapp://send?$phone=phone&text=$msg';
         //   return 'whatsapp://wa.me/$phone&text=$msg';
       }

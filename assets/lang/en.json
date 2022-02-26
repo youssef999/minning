@@ -1,6 +1,8 @@
 {
     "welcome" : "welcome"  , 
-    "homepage" : "homepage",
+    "homepage" : "Babil",
+    "reward":"profits",
+    "insta":"Contact us to solve problems",
     "minning":"Minning",
       "message": "Your Score should have more than or equal 1 million and 800 to request money",
      "scoree" : "Score",
@@ -8,13 +10,14 @@
       "txt" : "Minning",
     "txt1" : "Watch ads to continue",
     "watch" : "Watch ads",
+    "watch2" : "Watch ads",
      "txt4" :"Continue minning",
-     "txt11" : "1 Million & 800 thousand = 1 $ " ,
-      "txt2" : "18 Million = 10$",
+     "txt11" : "900 thousand = 1 $ " ,
+      "txt2" : "9 Million = 10$",
       "share" : "Share App ",
-      "txt3" : "180 Million = 100 $",
-      "txt44" : "1 Billion & 800 Million = 1000 $",
-      "txt5" : "Closed until app have 1 Million download"
+      "txt3" : "90 Million = 100 $",
+      "txt44" : "900 Million = 1000 $",
+      "txt5" : "9 Billion = 10000 $"
 
 
 }

@@ -1,10 +1,11 @@
 import 'package:ecommerce_api/components/applocal.dart';
-import 'package:ecommerce_api/pages/sliderintro/sliderIntro.dart';
+import 'package:ecommerce_api/on_boarding_screen.dart';
+import 'package:ecommerce_api/splash.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'pages/home/home.dart';
 
 SharedPreferences mySharedPreferences;
@@ -12,7 +13,7 @@ SharedPreferences mySharedPreferences;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   mySharedPreferences = await SharedPreferences.getInstance();
-  runApp(MyApp());
+  runApp(MyApp2());
 }
 
 class MyApp extends StatelessWidget {
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home:Home(), //SliderIntro(),
+        home: Home(), //OnBoardingScreen(), //SliderIntro(),
         localizationsDelegates: [
           AppLocale.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -42,14 +43,14 @@ class MyApp extends StatelessWidget {
         supportedLocales: [
           Locale("en", ""),
           Locale("ar", ""),
-          Locale("h",""),
+          Locale("hi", ""),
         ],
- 
+
         localeResolutionCallback: (currentLang, supportLang) {
           if (currentLang != null) {
             for (Locale locale in supportLang) {
               if (locale.languageCode == currentLang.languageCode) {
-                mySharedPreferences.setString("lang",currentLang.languageCode) ; 
+                mySharedPreferences.setString("lang", currentLang.languageCode);
                 return currentLang;
               }
             }
